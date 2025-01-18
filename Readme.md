@@ -5,6 +5,7 @@ INFO-6134-01-25W - 4
 
 ## Group Members
 1. Lakshay Veer
+2. Jaskaran Singh
 
 ## Project Description
 Cookwise is an AI-powered recipe application designed to help users make the most out of their available ingredients. The app takes user-provided ingredients as input and suggests one dish that can be prepared. It features a React Native frontend and a Java Spring Boot backend, which integrates OpenAI's API to generate recipe recommendations.
