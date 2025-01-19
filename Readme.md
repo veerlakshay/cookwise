@@ -19,8 +19,8 @@ Cookwise is an AI-powered recipe application designed to help users make the mos
 - **Usage**: The app relies on the OpenAI API to process ingredients and generate dish suggestions. The app display saved recipies in database on the favorites screen.
 
 ## App Features
-### Member 1: Lakshay Veer
-1. Accepts a list of ingredients and sends it to the OpenAI API for processing.
-2. Validates the user-provided ingredient list to ensure proper API responses.
-3. Takes user input and make it into more effective Prompt using Prompt Engineering.
-4. Stores favorite recipes in a database.
+### Member 1: Lakshay Veer (Backend)
+1. Backend accepts a list of ingredients and sends it to the OpenAI API for processing.
+2. Backend validates the user-provided ingredient list to ensure proper API responses.
+3. Backend takes user input and make it into more effective Prompt using Prompt Engineering.
+4. Backend stores favorite recipes in a database.
