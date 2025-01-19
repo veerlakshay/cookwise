@@ -7,6 +7,7 @@ INFO-6134-01-25W - 4
 1. Lakshay Veer
 2. Jaskaran Singh
 3. Lakshdeep Singh
+4. Bhanusri Uddagiri
 
 ## Project Description
 Cookwise is an AI-powered recipe application designed to help users make the most out of their available ingredients. The app takes user-provided ingredients as input and suggests one dish that can be prepared. It features a React Native frontend and a Java Spring Boot backend, which integrates OpenAI's API to generate recipe recommendations.
@@ -30,3 +31,10 @@ Cookwise is an AI-powered recipe application designed to help users make the mos
 2. Calculate and display the estimated calories, macronutrients, and other nutrition facts for the suggested recipe.
 3. You can select the number of portions needed to be made.
 4. Display a list of previously viewed or generated recipes for easy reference.
+
+## Member 4: Bhanusri Uddagiri
+1. Allow users to input ingredients, validate the input, and display suggested recipes on the first screen.
+2. Create a screen to list favorite recipes or saved recipes and a history of viewed recipes.
+3. Allow users to adjust portion sizes and ingredient quantities.
+4. Implementing sorting and filtering with simple dropdown menus.
+
