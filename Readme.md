@@ -32,6 +32,12 @@ Cookwise is an AI-powered recipe application designed to help users make the mos
 3. You can select the number of portions needed to be made.
 4. Display a list of previously viewed or generated recipes for easy reference.
 
+## Member 3: Jaskaran Singh (Frontend)
+1. Dark Mode: Allows users to toggle between light and dark themes for a personalized viewing experience.
+2. Timer Page: Provides a cooking timer to assist with recipe preparation.
+3. Favorites Recipe Page: Displays a collection of saved recipes.
+4. Scroll Feature for Favorites Page: Enables smooth scrolling or paginated loading for easy navigation of favorite recipes.
+
 ## Member 4: Bhanusri Uddagiri
 1. Allow users to input ingredients, validate the input, and display suggested recipes on the first screen.
 2. Create a screen to list favorite recipes or saved recipes and a history of viewed recipes.
