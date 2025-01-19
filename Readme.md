@@ -24,9 +24,3 @@ Cookwise is an AI-powered recipe application designed to help users make the mos
 2. Backend validates the user-provided ingredient list to ensure proper API responses.
 3. Backend takes user input and make it into more effective Prompt using Prompt Engineering.
 4. Backend stores favorite recipes in a database.
-
-## Member 2: Lakshdeep Singh
-1. Break down the recipe into clear, step-by-step cooking instructions with optional timers for each step.
-2. Calculate and display the estimated calories, macronutrients, and other nutrition facts for the suggested recipe.
-3. You can select the number of portions needed to be made.
-4. Display a list of previously viewed or generated recipes for easy reference.
