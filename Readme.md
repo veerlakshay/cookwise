@@ -19,6 +19,9 @@ Cookwise is an AI-powered recipe application designed to help users make the mos
 - **Source**: OpenAI API, mongoDB / MySql
 - **Usage**: The app relies on the OpenAI API to process ingredients and generate dish suggestions. The app display saved recipies in database on the favorites screen.
 
+## Tech stack
+React Native , Spring , Spring Boot , mongoDB / MySql
+
 ## App Features
 ### Member 1: Lakshay Veer (Backend)
 1. Accepts a list of ingredients and sends it to the OpenAI API for processing.
