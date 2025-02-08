@@ -14,6 +14,11 @@ const App = () => {
     }
   };
 
+  const removeIngredient = (index) => {
+    const updatedList = ingredientsList.filter((_, idx) => idx !== index);
+    setIngredientsList(updatedList);
+  };
+
   const toggleList = () => {
     setShowList(!showList); 
   };
@@ -46,20 +51,29 @@ const App = () => {
               <Text style={styles.buttonText}>Show List</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.list}>
+          
+          
+        </View>
+        <View style={styles.list}>
           {showList && (
             <FlatList
               data={ingredientsList}
               keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => <Text style={styles.listItem}>{item}</Text>}
+              renderItem={({ item ,index }) => (<View style={styles.listItemContainer}>
+                <Text style={styles.listItem}>{index}. {item}</Text>
+                <TouchableOpacity 
+                  style={styles.removeButton}
+                  onPress={() => removeIngredient(index)}
+                >
+                  <Text style={styles.buttonText}>Remove</Text>
+                </TouchableOpacity>
+              </View>)}
             />
           )}
           </View>
-          
-        </View>
       </View>
 
-      <StatusBar style='auto' />
+      <StatusBar style='light' backgroundColor="#E81B0E" />
     </SafeAreaView>
   );
 };
@@ -67,20 +81,19 @@ const App = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingTop: 50, 
+    paddingTop: 20, 
   },
   container: {
     alignItems: 'center',
     backgroundColor:"#E81B0E",
     marginBottom: 20,
+    
   },
   heading: {
     fontSize: 35,
     textAlign: 'center',
     fontFamily: 'cursive',
     color: '#fff',
-    borderBottomColor: 'red',
-    borderBottomWidth: 2,
     paddingBottom: 10,
   },
   main: {
@@ -116,18 +129,23 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
   },
-  listItem: {
+  listItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: 5,
+  },
+  listItem: {
     fontSize: 16,
     color: 'black',
   },
-  list:{
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    borderColor: '#ddd',
-    borderWidth: 1,
-  }
+  removeButton: {
+    backgroundColor: "#E81B0E",
+    paddingVertical: 5,
+    borderRadius: 5,
+    padding: 5,
+    alignItems: "center",
+  },
 });
 
 export default App;
