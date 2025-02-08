@@ -1,10 +1,10 @@
-package com.INFO_6134_01_25W_4.CookWise;
+package capstone.cookwise;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CookWiseApplicationTests {
+class CookwiseApplicationTests {
 
 	@Test
 	void contextLoads() {

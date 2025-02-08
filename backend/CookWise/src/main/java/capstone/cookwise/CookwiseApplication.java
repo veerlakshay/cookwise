@@ -1,13 +1,13 @@
-package com.INFO_6134_01_25W_4.CookWise;
+package capstone.cookwise;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CookWiseApplication {
+public class CookwiseApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CookWiseApplication.class, args);
+		SpringApplication.run(CookwiseApplication.class, args);
 	}
 
 }
