@@ -6,6 +6,7 @@ const App = () => {
   const [ingredient, setIngredient] = useState("");
   const [ingredientsList, setIngredientsList] = useState([]);
   const [showList, setShowList] = useState(false); 
+  const [recipes, setRecipes] = useState([]);
 
   const addIngredient = () => {
     if (ingredient.trim()) {
@@ -18,6 +19,29 @@ const App = () => {
     const updatedList = ingredientsList.filter((_, idx) => idx !== index);
     setIngredientsList(updatedList);
   };
+
+  const callApi = async () => {
+    try {
+      const url = `http://localhost:8080/get-recipes?ingredients=${encodeURIComponent(ingredientsList.join(","))}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setRecipes(result);
+    } catch (error) {
+      console.error('Error calling API:', error);
+    }
+  };
+
 
   const toggleList = () => {
     setShowList(!showList); 
@@ -49,6 +73,9 @@ const App = () => {
               style={styles.addButton}
             >
               <Text style={styles.buttonText}>Show List</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={callApi} style={styles.addButton}>
+              <Text style={styles.buttonText}>Search</Text>
             </TouchableOpacity>
           </View>
           
