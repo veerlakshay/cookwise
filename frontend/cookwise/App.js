@@ -97,6 +97,17 @@ const App = () => {
               </View>)}
             />
           )}
+          {recipes.length > 0 && (
+            <View style={styles.recipeContainer}>
+              <Text style={styles.recipeHeading}>Recipes:</Text>
+              <FlatList
+                data={recipes}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <Text style={styles.recipeItem}>- {item}</Text>
+                )}
+              />
+            </View>)}
           </View>
       </View>
 
