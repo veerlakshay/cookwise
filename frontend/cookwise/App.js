@@ -5,13 +5,13 @@ import { SafeAreaView, StyleSheet, TouchableOpacity, Text, View, TextInput, Flat
 const App = () => {
   const [ingredient, setIngredient] = useState("");
   const [ingredientsList, setIngredientsList] = useState([]);
-  const [showList, setShowList] = useState(false); 
+  const [showList, setShowList] = useState(false);
   const [recipes, setRecipes] = useState([]);
 
   const addIngredient = () => {
     if (ingredient.trim()) {
       setIngredientsList([...ingredientsList, ingredient]);
-      setIngredient(""); 
+      setIngredient("");
     }
   };
 
@@ -21,9 +21,9 @@ const App = () => {
   };
 
   const callApi = async () => {
+    console.log(ingredientsList.join(","))
     try {
-      const url = `http://localhost:8080/get-recipes?ingredients=${encodeURIComponent(ingredientsList.join(","))}`;
-
+      const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(ingredientsList.join(","))}`;
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -36,7 +36,8 @@ const App = () => {
       }
 
       const result = await response.json();
-      setRecipes(result);
+      console.log("result recived", result);
+      setRecipes(JSON.stringify(result));
     } catch (error) {
       console.error('Error calling API:', error);
     }
@@ -44,7 +45,7 @@ const App = () => {
 
 
   const toggleList = () => {
-    setShowList(!showList); 
+    setShowList(!showList);
   };
 
   return (
@@ -62,13 +63,13 @@ const App = () => {
             onChangeText={setIngredient}
           />
           <View style={styles.buttons}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={addIngredient}
               style={styles.addButton}
             >
               <Text style={styles.buttonText}>Add Ingredient</Text>
             </TouchableOpacity>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={toggleList}
               style={styles.addButton}
             >
@@ -78,17 +79,17 @@ const App = () => {
               <Text style={styles.buttonText}>Search</Text>
             </TouchableOpacity>
           </View>
-          
-          
+
+
         </View>
         <View style={styles.list}>
           {showList && (
             <FlatList
               data={ingredientsList}
               keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item ,index }) => (<View style={styles.listItemContainer}>
+              renderItem={({ item, index }) => (<View style={styles.listItemContainer}>
                 <Text style={styles.listItem}>{index}. {item}</Text>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.removeButton}
                   onPress={() => removeIngredient(index)}
                 >
@@ -99,16 +100,9 @@ const App = () => {
           )}
           {recipes.length > 0 && (
             <View style={styles.recipeContainer}>
-              <Text style={styles.recipeHeading}>Recipes:</Text>
-              <FlatList
-                data={recipes}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                  <Text style={styles.recipeItem}>- {item}</Text>
-                )}
-              />
+              <Text style={styles.recipeHeading}>Recipes: {recipes}</Text>
             </View>)}
-          </View>
+        </View>
       </View>
 
       <StatusBar style='light' backgroundColor="#E81B0E" />
@@ -119,13 +113,13 @@ const App = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    paddingTop: 20, 
+    paddingTop: 20,
   },
   container: {
     alignItems: 'center',
-    backgroundColor:"#E81B0E",
+    backgroundColor: "#E81B0E",
     marginBottom: 20,
-    
+
   },
   heading: {
     fontSize: 35,

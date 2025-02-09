@@ -12,7 +12,7 @@ public class RecipeService {
 
     public String getRecipesByIngredients(String ingredients) {
         String template = "Generate a recipe from these given ingreadients and"
-                + " send response in steps ingredients: " + ingredients;
+                + " send response in steps only in json format without any tics: " + ingredients;
         String chatResponse = chatModel.call(template);
         return chatResponse;
     }
