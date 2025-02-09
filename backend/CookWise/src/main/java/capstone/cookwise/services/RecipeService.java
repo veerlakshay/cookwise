@@ -12,7 +12,8 @@ public class RecipeService {
 
     public String getRecipesByIngredients(String ingredients) {
         String template = "Generate a recipe from these given ingreadients and"
-                + " send response in steps only in json format without any tics: " + ingredients;
+                + " send response JSON format without any tics , one key should be name and it's value should be name of recipe "
+                + " and another key should be steps and its value should be steps object with keys as number of steps and value as step" + ingredients;
         String chatResponse = chatModel.call(template);
         return chatResponse;
     }
