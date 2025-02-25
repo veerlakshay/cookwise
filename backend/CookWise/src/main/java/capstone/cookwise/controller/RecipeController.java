@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import capstone.cookwise.payload.Recipe;
 import capstone.cookwise.services.RecipeService;
 
 @RestController
@@ -24,10 +25,11 @@ public class RecipeController {
     }
 
     @GetMapping("/get-recipes")
-    public ResponseEntity<String> getRecipes(
+    public ResponseEntity<Recipe> getRecipes(
             @RequestParam(value = "ingredients") String ingredients
     ) throws IOException {
-        String recipe = recipeService.getRecipesByIngredients(ingredients);
+
+        Recipe recipe = recipeService.getRecipesByIngredients(ingredients);
         return ResponseEntity.ok(recipe);
     }
 }
