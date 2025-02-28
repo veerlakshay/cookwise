@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, FlatList, ActivityIndicator } from 'react-native';
 
 const HomeScreen = () => {
   const [ingredient, setIngredient] = useState("");  // State for the current ingredient input
   const [ingredientsList, setIngredientsList] = useState([]);  // State to store the list of ingredients
   const [recipe, setRecipe] = useState(null);  
   const [showList, setShowList] = useState(false); 
+  const [loading, setLoading] = useState(false); // State for loading
 
   
   const addIngredient = () => {
@@ -27,9 +28,16 @@ const HomeScreen = () => {
 
   // Call the API to get recipes
   const callApi = async () => {
-    const ingredients = ingredientsList.join(",");  // Convert the ingredients list to a string
-    console.log(ingredients);
+  
+    if (ingredientsList.length === 0) {
+      Alert.alert("No ingredients", "Please add at least one ingredient.");
+      return;
+    }
 
+    setLoading(true); // Start loading
+    const ingredients = ingredientsList.join(","); 
+
+    console.log(ingredients);
     try {
       const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(ingredients)}`;
       console.log("API URL:", url);
@@ -46,11 +54,19 @@ const HomeScreen = () => {
 
       const result = await response.json();
       console.log("result received", result);
-      setRecipe(result);  // Set the fetched recipe to state
+      if (!result || Object.keys(result).length === 0) {
+
+        Alert.alert("No recipes found", "Try different ingredients.");
+        setRecipe(null);
+      } else {
+        setRecipe(result);
+      }
     } catch (error) {
       console.error('Error calling API:', error);
       Alert.alert("Error", "Failed to fetch recipes. Please try again later.");
-    }
+    }finally {
+    setLoading(false); // Stop loading
+  }
   };
 
   return (
@@ -101,23 +117,25 @@ const HomeScreen = () => {
       />
       )}
 
-      {recipe && recipe.steps ? (
-        <ScrollView style={styles.recipeContainer}>
-          <Text style={styles.recipeHeading}>{recipe.name}</Text>
-          <Text style={styles.subHeading}>Steps:</Text>
-          {Object.keys(recipe.steps)
-            .sort((a, b) => parseInt(a) - parseInt(b))
-            .map((stepNumber) => (
-              <View key={stepNumber} style={styles.stepContainer}>
-                <Text style={styles.recipeText}>
-                  {stepNumber}. {recipe.steps[stepNumber]}
-                </Text>
-              </View>
-            ))}
-        </ScrollView>
-      ) : (
-        <Text style={styles.noRecipeText}>No recipe found. Try searching!</Text>
-      )}
+{loading ? (
+      <ActivityIndicator size="large" color="#E81B0E" style={{ marginTop: 20 }} />
+    ) : recipe && recipe.steps ? (
+      <ScrollView style={styles.recipeContainer}>
+        <Text style={styles.recipeHeading}>{recipe.name}</Text>
+        <Text style={styles.subHeading}>Steps:</Text>
+        {Object.keys(recipe.steps)
+          .sort((a, b) => parseInt(a) - parseInt(b))
+          .map((stepNumber) => (
+            <View key={stepNumber} style={styles.stepContainer}>
+              <Text style={styles.recipeText}>
+                {stepNumber}. {recipe.steps[stepNumber]}
+              </Text>
+            </View>
+          ))}
+      </ScrollView>
+    ) : (
+      <Text style={styles.noRecipeText}>No recipe found. Try searching!</Text>
+    )}
     </View>
   );
 };

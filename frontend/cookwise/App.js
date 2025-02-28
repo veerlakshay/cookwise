@@ -1,12 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons"; 
-import { SafeAreaView, StyleSheet, TouchableOpacity, Text, View, TextInput, ScrollView, Alert } from 'react-native';
+import { SafeAreaView, StyleSheet} from 'react-native';
 import TimerPage from './components/Timerpage';
 import HomeScreen from './components/HomeScreen';
-import Favourite from './components/Favourite';
 
 const Tab = createBottomTabNavigator();
 
@@ -34,7 +32,6 @@ const App = () => {
         >
           <Tab.Screen name="Home" component={HomeScreen}/>
           <Tab.Screen name="Timer" component={TimerPage} />
-          <Tab.Screen name='Favourite' component={Favourite}/>
         </Tab.Navigator>
       </NavigationContainer>
 
