@@ -17,6 +17,8 @@ public class Recipe {
     public static class RecipeDetail {
 
         private Map<String, String> preparation;
+        private int calories;  // Add the calories field
+
 
         public Map<String, String> getPreparation() {
             return preparation;
@@ -24,6 +26,14 @@ public class Recipe {
 
         public void setPreparation(Map<String, String> preparation) {
             this.preparation = preparation;
+        }
+
+        public int getCalories() {
+            return calories;
+        }
+
+        public void setCalories(int calories) {
+            this.calories = calories;
         }
     }
 }

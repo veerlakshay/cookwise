@@ -38,8 +38,14 @@ public class RecipeService {
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(responseString, Recipe.class);
-        } catch (JsonProcessingException e) {
+            Recipe recipe = mapper.readValue(responseString, Recipe.class);
+
+            recipe.getRecipes().forEach((name, details) -> {
+                int calories = extractCaloriesFromResponse(details);
+                details.setCalories(calories);
+            });
+            return recipe;        } 
+            catch (JsonProcessingException e) {
             logger.error("Failed to parse AI response as JSON: " + responseString, e);
             throw new IOException("Invalid response format received from AI", e);
         }
@@ -69,6 +75,19 @@ public class RecipeService {
 
         return response;
     }
+
+    private int extractCaloriesFromResponse(Recipe.RecipeDetail details) {
+        // Directly access the calories field, assuming it's provided in the response.
+        int calories = details.getCalories();  // This assumes the calories are set by the AI response
+    
+        if (calories > 0) {
+            return calories;
+        }
+    
+        // Default to 0 if no calories found or if the AI response doesn't provide a valid value
+        return 0;
+    }
+    
 
     public String loadPromptTemplate(String filename) throws IOException {
         try (InputStream inputStream = new ClassPathResource(filename).getInputStream()) {
