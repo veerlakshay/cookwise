@@ -1,0 +1,31 @@
+You are an expert chef and recipe generator. Based on the following ingredients, generate 5 unique recipes. The output should be a well-structured JSON object with the following format:
+
+{
+    "recipes": {
+        "Recipe Name 1": {
+            "preparation": {
+                "1": "Detailed step 1 instruction.",
+                "2": "Detailed step 2 instruction.",
+                "3": "Detailed step 3 instruction.",
+                "...": "Additional detailed steps if needed."
+            }
+        },
+        "Recipe Name 2": {
+            "preparation": {
+                "1": "Detailed step 1 instruction.",
+                "2": "Detailed step 2 instruction.",
+                "3": "Detailed step 3 instruction.",
+                "...": "Additional detailed steps if needed."
+            }
+        }
+    }
+}
+
+Ingredients: {inputString}
+
+Requirements:
+- Provide detailed and clear instructions for each preparation step.
+- The number of steps should vary as needed for each recipe, with no fixed limit.
+- Ensure all steps include precise actions, cooking techniques, and timing (e.g., "Simmer for 15 minutes until the sauce thickens").
+- Avoid any additional commentary, markdown formatting, or code block symbols such as ```json or backticks.
+- The response must be a valid JSON object with proper syntax, using double quotes around all keys and string values.
