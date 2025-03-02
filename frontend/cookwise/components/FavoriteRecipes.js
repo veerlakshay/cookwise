@@ -38,12 +38,17 @@ const FavoriteRecipes = () => {
     }
   };
 
+  // Remove recipe from favorites
+  const handleRemoveFavorite = (id) => {
+    setFavorites((prevFavorites) => prevFavorites.filter(recipe => recipe.id !== id));
+  };
+
   // Render each recipe item
   const renderRecipeItem = ({ item }) => (
     <View style={styles.recipeItem}>
       <Text style={styles.recipeName}>{item.name}</Text>
       <Text style={styles.recipeDescription}>{item.description}</Text>
-      <TouchableOpacity style={styles.favoriteButton}>
+      <TouchableOpacity style={styles.favoriteButton} onPress={() => handleRemoveFavorite(item.id)}>
         <Text style={styles.favoriteButtonText}>Remove from Favorites</Text>
       </TouchableOpacity>
     </View>
