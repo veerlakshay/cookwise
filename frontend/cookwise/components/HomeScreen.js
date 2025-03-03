@@ -1,46 +1,51 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, FlatList, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 
 const HomeScreen = () => {
-  const [ingredient, setIngredient] = useState("");  // State for the current ingredient input
-  const [ingredientsList, setIngredientsList] = useState([]);  // State to store the list of ingredients
-  const [recipe, setRecipe] = useState(null);  
-  const [showList, setShowList] = useState(false); 
-  const [loading, setLoading] = useState(false); // State for loading
+  const [ingredient, setIngredient] = useState('');
+  const [ingredientsList, setIngredientsList] = useState([]);
+  const [recipes, setRecipes] = useState(null);
+  const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  
   const addIngredient = () => {
     if (ingredient.trim()) {
       setIngredientsList([...ingredientsList, ingredient]);
-      setIngredient("");  // Clear the input field after adding
+      setIngredient('');
     }
   };
+
 
   const removeIngredient = (index) => {
     const updatedList = ingredientsList.filter((_, idx) => idx !== index);
     setIngredientsList(updatedList);
   };
 
-  // Toggle the visibility of the ingredient list
-  const toggleList = () => {
-    setShowList(!showList); 
-  };
 
-  // Call the API to get recipes
   const callApi = async () => {
-  
     if (ingredientsList.length === 0) {
-      Alert.alert("No ingredients", "Please add at least one ingredient.");
+      Alert.alert('No ingredients', 'Please add at least one ingredient.');
       return;
     }
 
-    setLoading(true); // Start loading
-    const ingredients = ingredientsList.join(","); 
+    setLoading(true);
+    const ingredients = ingredientsList.join(',');
 
-    console.log(ingredients);
     try {
-      const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(ingredients)}`;
-      console.log("API URL:", url);
+      const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(
+        ingredients
+      )}`;
+      console.log('API URL:', url);
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -53,20 +58,30 @@ const HomeScreen = () => {
       }
 
       const result = await response.json();
-      console.log("result received", result);
-      if (!result || Object.keys(result).length === 0) {
-
-        Alert.alert("No recipes found", "Try different ingredients.");
-        setRecipe(null);
+      console.log('API Response:', result);
+      if (!result.recipes || Object.keys(result.recipes).length === 0) {
+        Alert.alert('No recipes found', 'Try different ingredients.');
+        setRecipes(null);
       } else {
-        setRecipe(result);
+        setRecipes(result.recipes);
+        setSelectedRecipe(null);
       }
     } catch (error) {
       console.error('Error calling API:', error);
-      Alert.alert("Error", "Failed to fetch recipes. Please try again later.");
-    }finally {
-    setLoading(false); // Stop loading
-  }
+      Alert.alert('Error', 'Failed to fetch recipes. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleRecipeSelect = (recipeName) => {
+    setSelectedRecipe({ ...recipes[recipeName], name: recipeName });
+  };
+
+
+  const goBackToRecipes = () => {
+    setSelectedRecipe(null);
   };
 
   return (
@@ -78,20 +93,10 @@ const HomeScreen = () => {
           style={styles.input}
           placeholder="e.g., eggs, milk"
           value={ingredient}
-          onChangeText={setIngredient}  // Update ingredient state as user types
+          onChangeText={setIngredient}
         />
-        <TouchableOpacity 
-          style={styles.button}
-          onPress={addIngredient}
-        >
+        <TouchableOpacity style={styles.button} onPress={addIngredient}>
           <Text style={styles.buttonText}>Add Ingredient</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          onPress={toggleList}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Show List</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={callApi} style={styles.button}>
@@ -99,43 +104,83 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {showList && (
-        <FlatList
-        data={ingredientsList}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.listItemContainer}>
-            <Text style={styles.listItem}>{index + 1}. {item}</Text>
-            <TouchableOpacity 
-              style={styles.removeButton}
-              onPress={() => removeIngredient(index)}
-            >
-              <Text style={styles.button}>Remove</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
+      {/* Display ingredients list */}
+      {ingredientsList.length > 0 && (
+        <View style={styles.ingredientsContainer}>
+          <Text style={styles.subHeading}>Ingredients:</Text>
+          <FlatList
+            data={ingredientsList}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({ item, index }) => (
+              <View style={styles.listItemContainer}>
+                <Text style={styles.listItem}>
+                  {index + 1}. {item}
+                </Text>
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  onPress={() => removeIngredient(index)}
+                >
+                  <Text style={styles.buttonText}>Remove</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+        </View>
       )}
 
-{loading ? (
-      <ActivityIndicator size="large" color="#E81B0E" style={{ marginTop: 20 }} />
-    ) : recipe && recipe.steps ? (
-      <ScrollView style={styles.recipeContainer}>
-        <Text style={styles.recipeHeading}>{recipe.name}</Text>
-        <Text style={styles.subHeading}>Steps:</Text>
-        {Object.keys(recipe.steps)
-          .sort((a, b) => parseInt(a) - parseInt(b))
-          .map((stepNumber) => (
-            <View key={stepNumber} style={styles.stepContainer}>
-              <Text style={styles.recipeText}>
-                {stepNumber}. {recipe.steps[stepNumber]}
+      {loading ? (
+        <ActivityIndicator size="large" color="#E81B0E" style={{ marginTop: 20 }} />
+      ) : recipes ? (
+        <View style={styles.recipeContainer}>
+          {/* Display recipe choices */}
+          {!selectedRecipe && (
+            <FlatList
+              data={Object.keys(recipes)}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={styles.recipeChoice}
+                  onPress={() => handleRecipeSelect(item)}
+                >
+                  <Text style={styles.recipeChoiceText}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          )}
+
+          {/* Display selected recipe details */}
+          {selectedRecipe && (
+            <ScrollView>
+              {/* Recipe Header with Back Button */}
+              <View style={styles.recipeHeader}>
+                <TouchableOpacity
+                  style={styles.smallBackButton}
+                  onPress={goBackToRecipes}
+                >
+                  <Text style={styles.smallBackButtonText}>←</Text>
+                </TouchableOpacity>
+                <Text style={styles.recipeHeading}>{selectedRecipe.name}</Text>
+              </View>
+
+              <Text style={styles.subHeading}>
+                Calories: {selectedRecipe.calories}
               </Text>
-            </View>
-          ))}
-      </ScrollView>
-    ) : (
-      <Text style={styles.noRecipeText}>No recipe found. Try searching!</Text>
-    )}
+              <Text style={styles.subHeading}>Steps:</Text>
+              {Object.keys(selectedRecipe.preparation)
+                .sort((a, b) => parseInt(a) - parseInt(b))
+                .map((stepNumber) => (
+                  <View key={stepNumber} style={styles.stepContainer}>
+                    <Text style={styles.recipeText}>
+                      {stepNumber}. {selectedRecipe.preparation[stepNumber]}
+                    </Text>
+                  </View>
+                ))}
+            </ScrollView>
+          )}
+        </View>
+      ) : (
+        <Text style={styles.noRecipeText}>No recipe found. Try searching!</Text>
+      )}
     </View>
   );
 };
@@ -144,6 +189,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    paddingBottom: 80, // Add padding to avoid overlap with the tab bar
     backgroundColor: '#fff',
   },
   heading: {
@@ -170,24 +216,54 @@ const styles = StyleSheet.create({
     height: 40,
   },
   button: {
-    backgroundColor: "#E81B0E",
+    backgroundColor: '#E81B0E',
     paddingVertical: 10,
     borderRadius: 5,
-    alignItems: "center",
+    alignItems: 'center',
     margin: 5,
   },
   buttonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
+  },
+  ingredientsContainer: {
+    marginTop: 10,
   },
   recipeContainer: {
     marginTop: 20,
   },
+  recipeChoice: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  recipeChoiceText: {
+    fontSize: 18,
+    color: '#333',
+  },
+  recipeHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   recipeHeading: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 10,
     color: '#E81B0E',
+    marginLeft: 10,
+  },
+  smallBackButton: {
+    backgroundColor: '#E81B0E',
+    padding: 5,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 30,
+    height: 30,
+  },
+  smallBackButtonText: {
+    color: '#fff',
+    fontSize: 18,
   },
   subHeading: {
     fontSize: 20,
@@ -204,15 +280,26 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   noRecipeText: {
-    color: "black",
-    textAlign: "center",
+    color: 'black',
+    textAlign: 'center',
     marginTop: 20,
   },
   listItem: {
     fontSize: 18,
     marginBottom: 5,
-    color: "#333",
-  }
+    color: '#333',
+  },
+  listItemContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  removeButton: {
+    backgroundColor: '#E81B0E',
+    padding: 5,
+    borderRadius: 5,
+  },
 });
 
 export default HomeScreen;
