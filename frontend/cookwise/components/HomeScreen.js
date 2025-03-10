@@ -10,8 +10,22 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
+
+
+
+
 
 const HomeScreen = () => {
+  const navigation = useNavigation();
+  const handleRecipeSelect = (recipeName) => {
+    navigation.navigate('RecipeDetail', {
+      selectedRecipe: { ...recipes[recipeName], name: recipeName }
+    });
+  };
+
+
   const [ingredient, setIngredient] = useState('');
   const [ingredientsList, setIngredientsList] = useState([]);
   const [recipes, setRecipes] = useState(null);
@@ -75,9 +89,7 @@ const HomeScreen = () => {
   };
 
 
-  const handleRecipeSelect = (recipeName) => {
-    setSelectedRecipe({ ...recipes[recipeName], name: recipeName });
-  };
+  
 
 
   const goBackToRecipes = () => {
@@ -148,35 +160,7 @@ const HomeScreen = () => {
             />
           )}
 
-          {/* Display selected recipe details */}
-          {selectedRecipe && (
-            <ScrollView>
-              {/* Recipe Header with Back Button */}
-              <View style={styles.recipeHeader}>
-                <TouchableOpacity
-                  style={styles.smallBackButton}
-                  onPress={goBackToRecipes}
-                >
-                  <Text style={styles.smallBackButtonText}>←</Text>
-                </TouchableOpacity>
-                <Text style={styles.recipeHeading}>{selectedRecipe.name}</Text>
-              </View>
-
-              <Text style={styles.subHeading}>
-                Calories: {selectedRecipe.calories}
-              </Text>
-              <Text style={styles.subHeading}>Steps:</Text>
-              {Object.keys(selectedRecipe.preparation)
-                .sort((a, b) => parseInt(a) - parseInt(b))
-                .map((stepNumber) => (
-                  <View key={stepNumber} style={styles.stepContainer}>
-                    <Text style={styles.recipeText}>
-                      {stepNumber}. {selectedRecipe.preparation[stepNumber]}
-                    </Text>
-                  </View>
-                ))}
-            </ScrollView>
-          )}
+          
         </View>
       ) : (
         <Text style={styles.noRecipeText}>No recipe found. Try searching!</Text>

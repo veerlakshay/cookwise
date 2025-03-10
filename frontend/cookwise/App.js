@@ -6,8 +6,22 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 import TimerPage from './components/Timerpage';
 import HomeScreen from './components/HomeScreen';
 import FavoriteRecipes from './components/FavoriteRecipes';
+import Recipe from './components/Recipe';
+import { createStackNavigator } from '@react-navigation/stack';  // Use createStackNavigator
+
+
+const Stack = createStackNavigator(); 
 
 const Tab = createBottomTabNavigator();
+
+
+const HomeStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="HomeMain" component={HomeScreen} />
+    <Stack.Screen name="RecipeDetail" component={Recipe} />
+  </Stack.Navigator>
+);
+
 
 const App = () => {
   return (
@@ -31,7 +45,7 @@ const App = () => {
             headerShown: false,
           })}
         >
-          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Home" component={HomeStack} />
           <Tab.Screen name="Timer" component={TimerPage} />
           <Tab.Screen name="Favorites" component={FavoriteRecipes} />
         </Tab.Navigator>
