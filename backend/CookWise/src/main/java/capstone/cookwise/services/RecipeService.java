@@ -15,6 +15,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import capstone.cookwise.payload.Recipe;
@@ -38,14 +39,23 @@ public class RecipeService {
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            Recipe recipe = mapper.readValue(responseString, Recipe.class);
+            JsonNode rootNode = mapper.readTree(responseString);
 
+            // Check if response contains an "error" key (invalid ingredients case)
+            if (rootNode.has("error")) {
+                String errorMessage = rootNode.get("error").get("message").asText();
+                logger.error("Invalid ingredients detected: " + errorMessage);
+                throw new IOException(errorMessage);
+            }
+
+            // If response is valid, deserialize it into Recipe object
+            Recipe recipe = mapper.treeToValue(rootNode, Recipe.class);
             recipe.getRecipes().forEach((name, details) -> {
                 int calories = extractCaloriesFromResponse(details);
                 details.setCalories(calories);
             });
-            return recipe;        } 
-            catch (JsonProcessingException e) {
+            return recipe;
+        } catch (JsonProcessingException e) {
             logger.error("Failed to parse AI response as JSON: " + responseString, e);
             throw new IOException("Invalid response format received from AI", e);
         }
@@ -78,16 +88,15 @@ public class RecipeService {
 
     private int extractCaloriesFromResponse(Recipe.RecipeDetail details) {
         // Directly access the calories field, assuming it's provided in the response.
-        int calories = details.getCalories();  // This assumes the calories are set by the AI response
-    
+        int calories = details.getCalories();
+
         if (calories > 0) {
             return calories;
         }
-    
+
         // Default to 0 if no calories found or if the AI response doesn't provide a valid value
         return 0;
     }
-    
 
     public String loadPromptTemplate(String filename) throws IOException {
         try (InputStream inputStream = new ClassPathResource(filename).getInputStream()) {

@@ -31,3 +31,12 @@ Requirements:
 - Ensure all steps include precise actions, cooking techniques, and timing (e.g., "Simmer for 15 minutes until the sauce thickens").
 - Avoid any additional commentary, markdown formatting, or code block symbols such as ```json or backticks.
 - The response must be a valid JSON object with proper syntax, using double quotes around all keys and string values.
+
+Invalid Ingredients Handling:
+If any of the provided ingredients are invalid, return the following JSON format instead of recipes:
+
+{
+   "error": {
+       "message": "Invalid ingredients provided. Please enter proper ingredients."
+   }
+}

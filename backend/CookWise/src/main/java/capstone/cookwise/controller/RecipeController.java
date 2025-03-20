@@ -1,6 +1,7 @@
 package capstone.cookwise.controller;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,10 +46,19 @@ public class RecipeController {
             return ResponseEntity.ok(recipe);
         } catch (IOException e) {
             logger.error("Error fetching recipes for ingredients: {}", ingredients, e);
+
+            // Check if the error message matches invalid ingredient case
+            if (e.getMessage().contains("Invalid ingredients provided")) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                        Map.of("error", Map.of("message", "Invalid ingredients provided. Please enter proper ingredients."))
+                );
+            }
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch recipes due to server error.");
         } catch (Exception e) {
             logger.error("Unexpected error: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
     }
+
 }
