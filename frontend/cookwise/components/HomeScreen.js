@@ -45,7 +45,6 @@ const HomeScreen = () => {
     setIngredientsList(updatedList);
   };
 
-
   const callApi = async () => {
     if (ingredientsList.length === 0) {
       Alert.alert('No ingredients', 'Please add at least one ingredient.');
@@ -56,10 +55,9 @@ const HomeScreen = () => {
     const ingredients = ingredientsList.join(',');
 
     try {
-      const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(
-        ingredients
-      )}`;
+      const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(ingredients)}`;
       console.log('API URL:', url);
+
       const response = await fetch(url, {
         method: 'GET',
         headers: {
@@ -67,12 +65,23 @@ const HomeScreen = () => {
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP Error! Status: ${response.status}`);
-      }
-
       const result = await response.json();
       console.log('API Response:', result);
+
+      // Handle HTTP errors
+      if (!response.ok) {
+        if (response.status === 400 && result.error?.message) {
+          Alert.alert('Invalid Ingredients', result.error.message);
+        } else if (response.status === 204) {
+          Alert.alert('No recipes found', 'Try different ingredients.');
+        } else {
+          Alert.alert('Error', 'Failed to fetch recipes. Please try again later.');
+        }
+        setRecipes(null);
+        return;
+      }
+
+      // Handle successful response
       if (!result.recipes || Object.keys(result.recipes).length === 0) {
         Alert.alert('No recipes found', 'Try different ingredients.');
         setRecipes(null);
@@ -88,8 +97,6 @@ const HomeScreen = () => {
     }
   };
 
-
-  
 
 
   const goBackToRecipes = () => {
@@ -160,7 +167,7 @@ const HomeScreen = () => {
             />
           )}
 
-          
+
         </View>
       ) : (
         <Text style={styles.noRecipeText}>No recipe found. Try searching!</Text>

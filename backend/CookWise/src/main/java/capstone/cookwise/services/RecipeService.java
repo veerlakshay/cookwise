@@ -41,17 +41,17 @@ public class RecipeService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode rootNode = mapper.readTree(responseString);
 
-            // Check if response contains an "error" key (invalid ingredients case)
+            // Handle invalid ingredient errors
             if (rootNode.has("error")) {
                 String errorMessage = rootNode.get("error").get("message").asText();
                 logger.error("Invalid ingredients detected: " + errorMessage);
                 throw new IOException(errorMessage);
             }
 
-            // If response is valid, deserialize it into Recipe object
+            // Deserialize valid response
             Recipe recipe = mapper.treeToValue(rootNode, Recipe.class);
             recipe.getRecipes().forEach((name, details) -> {
-                int calories = extractCaloriesFromResponse(details);
+                String calories = extractCaloriesFromResponse(details);
                 details.setCalories(calories);
             });
             return recipe;
@@ -86,16 +86,23 @@ public class RecipeService {
         return response;
     }
 
-    private int extractCaloriesFromResponse(Recipe.RecipeDetail details) {
-        // Directly access the calories field, assuming it's provided in the response.
-        int calories = details.getCalories();
-
-        if (calories > 0) {
-            return calories;
+    private String extractCaloriesFromResponse(Recipe.RecipeDetail details) {
+        if (details == null || details.getCalories() == null) {
+            return "Unknown"; // Default if missing
         }
 
-        // Default to 0 if no calories found or if the AI response doesn't provide a valid value
-        return 0;
+        String calorieString = details.getCalories().trim(); // Trim any extra spaces
+
+        try {
+            // Ensure we extract only valid calorie numbers while preserving unit (e.g., "180 per slice")
+            if (calorieString.matches(".*\\d+.*")) {
+                return calorieString;  // Keep the original string if it contains numbers
+            }
+            return "Unknown"; // If no numeric data is found, return "Unknown"
+        } catch (Exception e) {
+            logger.warn("Failed to process calories from response: " + details.getCalories(), e);
+            return "Unknown"; // Fallback in case of errors
+        }
     }
 
     public String loadPromptTemplate(String filename) throws IOException {
