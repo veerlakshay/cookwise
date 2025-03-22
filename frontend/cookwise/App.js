@@ -7,13 +7,11 @@ import TimerPage from './components/Timerpage';
 import HomeScreen from './components/HomeScreen';
 import FavoriteRecipes from './components/FavoriteRecipes';
 import Recipe from './components/Recipe';
-import { createStackNavigator } from '@react-navigation/stack';  // Use createStackNavigator
+import RecipeHistory from './components/RecipeHistory';
+import { createStackNavigator } from '@react-navigation/stack';
 
-
-const Stack = createStackNavigator(); 
-
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
 
 const HomeStack = () => (
   <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -21,7 +19,6 @@ const HomeStack = () => (
     <Stack.Screen name="RecipeDetail" component={Recipe} />
   </Stack.Navigator>
 );
-
 
 const App = () => {
   return (
@@ -37,6 +34,8 @@ const App = () => {
                 iconName = "timer";
               } else if (route.name === "Favorites") {
                 iconName = "heart";
+              } else if (route.name === "History") {
+                iconName = "time"; // Ionicons has a 'time' icon for history
               }
               return <Ionicons name={iconName} size={size} color={color} />;
             },
@@ -48,6 +47,7 @@ const App = () => {
           <Tab.Screen name="Home" component={HomeStack} />
           <Tab.Screen name="Timer" component={TimerPage} />
           <Tab.Screen name="Favorites" component={FavoriteRecipes} />
+          <Tab.Screen name="History" component={RecipeHistory} />
         </Tab.Navigator>
       </NavigationContainer>
 
