@@ -31,14 +31,18 @@ public class RecipeController {
     }
 
     @GetMapping("/get-recipes")
-    public ResponseEntity<?> getRecipes(@RequestParam(value = "ingredients", required = false) String ingredients) {
+    public ResponseEntity<?> getRecipes(@RequestParam(value = "ingredients", required = false) String ingredients, @RequestParam(value = "portions", required = false) String portions) {
         if (ingredients == null || ingredients.trim().isEmpty()) {
             logger.warn("Ingredients parameter is empty");
             return ResponseEntity.badRequest().body("Ingredients parameter cannot be empty.");
         }
 
+        if (portions == null || portions.trim().isEmpty()) {
+            portions = "4"; // Default to 4 portions if not specified
+        }
+
         try {
-            Recipe recipe = recipeService.getRecipesByIngredients(ingredients);
+            Recipe recipe = recipeService.getRecipesByIngredients(ingredients, portions);
             if (recipe == null || recipe.getRecipes().isEmpty()) {
                 logger.info("No recipes found for ingredients: {}", ingredients);
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No recipes found for the given ingredients.");

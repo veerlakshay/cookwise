@@ -32,6 +32,8 @@ const HomeScreen = () => {
   const [recipes, setRecipes] = useState(null);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [portion, setPortion] = useState('');
+
 
   const addIngredient = () => {
     if (ingredient.trim()) {
@@ -56,7 +58,7 @@ const HomeScreen = () => {
     const ingredients = ingredientsList.join(',');
 
     try {
-      const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(ingredients)}`;
+      const url = `http://localhost:8080/recipes/get-recipes?ingredients=${encodeURIComponent(ingredients)}&portions=${portion}`;
       console.log('API URL:', url);
 
       const response = await fetch(url, {
@@ -122,6 +124,13 @@ const HomeScreen = () => {
         <TouchableOpacity onPress={callApi} style={styles.button}>
           <Text style={styles.buttonText}>Search</Text>
         </TouchableOpacity>
+        <TextInput
+  style={styles.input}
+  placeholder="Number of portions (e.g., 2)"
+  keyboardType="numeric"
+  value={portion}
+  onChangeText={setPortion}
+/>
       </View>
 
       {/* Display ingredients list */}

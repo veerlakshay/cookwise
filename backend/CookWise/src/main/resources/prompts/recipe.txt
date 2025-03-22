@@ -24,9 +24,10 @@ You are an expert chef and recipe generator. Based on the following ingredients,
 }
 
 Ingredients: {inputString}
+Portions: {portions}
 
 Requirements:
-- Provide detailed and clear instructions for each preparation step and calories.
+- Provide detailed and clear instructions for each preparation step and calories for given portion or number of people.
 - The number of steps should vary as needed for each recipe, with no fixed limit.
 - Ensure all steps include precise actions, cooking techniques, and timing (e.g., "Simmer for 15 minutes until the sauce thickens").
 - Avoid any additional commentary, markdown formatting, or code block symbols such as ```json or backticks.

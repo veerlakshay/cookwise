@@ -28,10 +28,12 @@ public class RecipeService {
     @Autowired
     private ChatModel chatModel;
 
-    public Recipe getRecipesByIngredients(String inputString) throws IOException {
+    public Recipe getRecipesByIngredients(String inputString, String portions) throws IOException {
         String template = this.loadPromptTemplate("prompts/recipe.txt");
-        String promptString = this.putValuesInPrompt(template, Map.of("inputString", inputString));
-        ChatResponse recipeResponse = chatModel.call(new Prompt(promptString));
+        String promptString = this.putValuesInPrompt(template, Map.of(
+            "inputString", inputString,
+            "portions", portions  // New addition for portions
+        ));        ChatResponse recipeResponse = chatModel.call(new Prompt(promptString));
         String responseString = recipeResponse.getResult().getOutput().getContent().trim();
 
         logger.debug("Raw AI response: " + responseString);
