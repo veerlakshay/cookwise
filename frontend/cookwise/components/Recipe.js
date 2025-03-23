@@ -1,76 +1,107 @@
+import React from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useTheme } from './ThemeContext';
 
-import React, { useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+const RecipeDetails = ({ route }) => {
+  const { selectedRecipe } = route.params || {};
+  const navigation = useNavigation();
+  const { theme } = useTheme();
 
-const Recipe = ({ route, navigation }) => {
-  const { selectedRecipe } = route.params;
+  if (!selectedRecipe) {
+    return (
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.errorText, { color: theme.text }]}>Recipe not found</Text>
+      </View>
+    );
+  }
 
-  useEffect(() => {
-    const saveRecipeToHistory = async () => {
-      try {
-        const history = await AsyncStorage.getItem('recipeHistory');
-        let parsedHistory = history ? JSON.parse(history) : [];
-
-        // Avoid duplicates
-        parsedHistory = parsedHistory.filter(item => item.id !== selectedRecipe.id);
-        parsedHistory.unshift(selectedRecipe); // Add new recipe at the top
-
-        if (parsedHistory.length > 20) parsedHistory.pop(); // Limit history to 20 items
-
-        await AsyncStorage.setItem('recipeHistory', JSON.stringify(parsedHistory));
-      } catch (error) {
-        console.error("Error saving history:", error);
-      }
-    };
-
-    saveRecipeToHistory();
-  }, [selectedRecipe]);
+  const goBack = () => {
+    navigation.goBack();
+  };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>←</Text>
+        <TouchableOpacity onPress={goBack} style={[styles.backButton, { backgroundColor: theme.primary }]}>
+          <Text style={styles.backButtonText}>Back</Text>
         </TouchableOpacity>
-        <Text style={styles.recipeName}>{selectedRecipe.name}</Text>
+        <Text style={[styles.recipeTitle, { color: theme.primary }]}>{selectedRecipe.name}</Text>
       </View>
-      
-      <Text style={styles.subHeading}>Calories: {selectedRecipe.calories}</Text>
-      <Text style={styles.subHeading}>Steps:</Text>
-      {Object.keys(selectedRecipe.preparation)
-        .sort((a, b) => parseInt(a) - parseInt(b))
-        .map((stepNumber) => (
-          <Text key={stepNumber} style={styles.recipeText}>
-            {stepNumber}. {selectedRecipe.preparation[stepNumber]}
-          </Text>
-        ))}
+
+      <View style={styles.detailsContainer}>
+        <Text style={[styles.subHeading, { color: theme.text }]}>Ingredients:</Text>
+        <View style={styles.ingredientList}>
+          {selectedRecipe.ingredients.map((ingredient, index) => (
+            <Text key={index} style={[styles.ingredientText, { color: theme.text }]}>
+              {ingredient}
+            </Text>
+          ))}
+        </View>
+
+        <Text style={[styles.subHeading, { color: theme.text }]}>Steps:</Text>
+        <View style={styles.stepList}>
+          {selectedRecipe.steps.map((step, index) => (
+            <Text key={index} style={[styles.stepText, { color: theme.text }]}>
+              {`${index + 1}. ${step}`}
+            </Text>
+          ))}
+        </View>
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  recipeName: { fontSize: 24, fontWeight: 'bold', color: '#E81B0E' },
-  subHeading: { fontSize: 20, marginTop: 10, marginBottom: 5, color: '#333' },
-  recipeText: { fontSize: 16, color: '#555', marginBottom: 5 },
-  backButton: {
-    backgroundColor: '#E81B0E',
-    padding: 10,
-    width: 40,
-    borderRadius: 5,
-    marginBottom: 10,
+  container: {
+    flex: 1,
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 20,
+  },
+  backButton: {
+    padding: 10,
+    borderRadius: 5,
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  recipeTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    marginLeft: 20,
+  },
+  detailsContainer: {
+    marginTop: 20,
+  },
+  subHeading: {
+    fontSize: 22,
+    fontWeight: 'bold',
     marginBottom: 10,
   },
-  backButtonText: { color: '#fff', fontSize: 16 },
+  ingredientList: {
+    marginBottom: 20,
+  },
+  ingredientText: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  stepList: {
+    marginBottom: 20,
+  },
+  stepText: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  errorText: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });
 
-export default Recipe;
+export default RecipeDetails;

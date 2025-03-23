@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useTheme } from './ThemeContext'; // Import dark mode context
 
 const FavoriteRecipes = () => {
+  const { isDarkMode } = useTheme(); // Get dark mode state
   const [favorites, setFavorites] = useState([]); // List of favorite recipes
   const [loading, setLoading] = useState(false); // Loading state for pagination
   const [page, setPage] = useState(1); // Current page for pagination
@@ -45,11 +47,11 @@ const FavoriteRecipes = () => {
 
   // Render each recipe item
   const renderRecipeItem = ({ item }) => (
-    <View style={styles.recipeItem}>
-      <Text style={styles.recipeName}>{item.name}</Text>
-      <Text style={styles.recipeDescription}>{item.description}</Text>
-      <TouchableOpacity style={styles.favoriteButton} onPress={() => handleRemoveFavorite(item.id)}>
-        <Text style={styles.favoriteButtonText}>Remove from Favorites</Text>
+    <View style={[styles.recipeItem, isDarkMode && styles.darkRecipeItem]}>
+      <Text style={[styles.recipeName, isDarkMode && styles.darkRecipeName]}>{item.name}</Text>
+      <Text style={[styles.recipeDescription, isDarkMode && styles.darkRecipeDescription]}>{item.description}</Text>
+      <TouchableOpacity style={[styles.favoriteButton, isDarkMode && styles.darkFavoriteButton]} onPress={() => handleRemoveFavorite(item.id)}>
+        <Text style={[styles.favoriteButtonText, isDarkMode && styles.darkFavoriteButtonText]}>Remove from Favorites</Text>
       </TouchableOpacity>
     </View>
   );
@@ -65,8 +67,8 @@ const FavoriteRecipes = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Favorite Recipes</Text>
+    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
+      <Text style={[styles.heading, isDarkMode && styles.darkHeading]}>Favorite Recipes</Text>
       <FlatList
         data={favorites}
         keyExtractor={(item) => item.id.toString()}
@@ -86,12 +88,18 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f9f9f9',
   },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333',
     textAlign: 'center',
+  },
+  darkHeading: {
+    color: '#fff',
   },
   listContent: {
     paddingBottom: 20, // Add padding at the bottom of the list
@@ -107,16 +115,26 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
+  darkRecipeItem: {
+    backgroundColor: '#1E1E1E',
+    shadowColor: '#000',
+  },
   recipeName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#E81B0E',
     marginBottom: 5,
   },
+  darkRecipeName: {
+    color: '#FF6B6B',
+  },
   recipeDescription: {
     fontSize: 14,
     color: '#666',
     marginBottom: 10,
+  },
+  darkRecipeDescription: {
+    color: '#ccc',
   },
   favoriteButton: {
     backgroundColor: '#E81B0E',
@@ -124,10 +142,16 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
   },
+  darkFavoriteButton: {
+    backgroundColor: '#FF6B6B',
+  },
   favoriteButtonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  darkFavoriteButtonText: {
+    color: '#000',
   },
   loadingContainer: {
     padding: 10,

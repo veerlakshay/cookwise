@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from './ThemeContext';
 
 const RecipeHistory = ({ navigation }) => {
   const [history, setHistory] = useState([]);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -16,17 +18,19 @@ const RecipeHistory = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Previously Viewed Recipes</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.header, { color: theme.text }]}>Previously Viewed Recipes</Text>
       <FlatList
         data={history}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity 
-            style={styles.item} 
+            style={[styles.item, { backgroundColor: theme.card }]} 
             onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}
           >
-            <Text style={styles.recipeText}>{item.name}</Text>
+            <Text style={[styles.recipeText, { color: theme.text }]}>
+              {item.name}
+            </Text>
           </TouchableOpacity>
         )}
       />
@@ -35,10 +39,23 @@ const RecipeHistory = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  header: { fontSize: 20, fontWeight: 'bold', marginBottom: 10 },
-  item: { padding: 15, borderBottomWidth: 1, borderBottomColor: '#ccc' },
-  recipeText: { fontSize: 16 },
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  item: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  recipeText: {
+    fontSize: 16,
+  },
 });
 
 export default RecipeHistory;

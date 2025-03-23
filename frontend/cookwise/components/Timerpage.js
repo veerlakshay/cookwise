@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { useTheme } from './ThemeContext';
 
 const TimerPage = () => {
-  const [time, setTime] = useState(0); // Time in seconds
-  const [isActive, setIsActive] = useState(false); // Timer running state
-  const [inputTime, setInputTime] = useState(''); // User input for custom time
+  const [time, setTime] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+  const [inputTime, setInputTime] = useState('');
+  const { theme } = useTheme();
 
-  // Effect to handle the timer countdown
   useEffect(() => {
     let interval = null;
 
@@ -17,7 +18,6 @@ const TimerPage = () => {
     } else if (time === 0) {
       clearInterval(interval);
       setIsActive(false);
-      // Show an alert when the timer reaches zero
       Alert.alert(
         'Time\'s Up!',
         'Your timer has finished.',
@@ -30,28 +30,23 @@ const TimerPage = () => {
     return () => clearInterval(interval);
   }, [isActive, time]);
 
-  // Start the timer
   const startTimer = () => {
     setIsActive(true);
   };
 
-  // Pause the timer
   const pauseTimer = () => {
     setIsActive(false);
   };
 
-  // Reset the timer
   const resetTimer = () => {
     setTime(0);
     setIsActive(false);
   };
 
-  // Handle input change for custom time
   const handleInputChange = (text) => {
     setInputTime(text);
   };
 
-  // Set custom time from input
   const setCustomTime = () => {
     const timeInSeconds = parseInt(inputTime, 10);
     if (!isNaN(timeInSeconds) && timeInSeconds > 0) {
@@ -59,7 +54,6 @@ const TimerPage = () => {
     }
   };
 
-  // Format time as MM:SS
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = time % 60;
@@ -67,35 +61,44 @@ const TimerPage = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Cookwise Timer</Text>
-      <Text style={styles.timerDisplay}>{formatTime(time)}</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.heading, { color: theme.text }]}>Cookwise Timer</Text>
+      <Text style={[styles.timerDisplay, { color: theme.primary }]}>
+        {formatTime(time)}
+      </Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: theme.card, color: theme.text, borderColor: theme.border }]}
         placeholder="Enter time in seconds"
+        placeholderTextColor={theme.placeholder}
         value={inputTime}
         onChangeText={handleInputChange}
         keyboardType="numeric"
       />
-      <TouchableOpacity style={styles.setTimeButton} onPress={setCustomTime}>
+      <TouchableOpacity 
+        style={[styles.setTimeButton, { backgroundColor: theme.primary }]} 
+        onPress={setCustomTime}
+      >
         <Text style={styles.buttonText}>Set Time</Text>
       </TouchableOpacity>
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.button, isActive || time === 0 ? styles.disabledButton : null]}
+          style={[styles.button, { backgroundColor: theme.primary }]}
           onPress={startTimer}
           disabled={isActive || time === 0}
         >
           <Text style={styles.buttonText}>Start</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.button, !isActive ? styles.disabledButton : null]}
+          style={[styles.button, { backgroundColor: theme.primary }]}
           onPress={pauseTimer}
           disabled={!isActive}
         >
           <Text style={styles.buttonText}>Pause</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={resetTimer}>
+        <TouchableOpacity 
+          style={[styles.button, { backgroundColor: theme.primary }]} 
+          onPress={resetTimer}
+        >
           <Text style={styles.buttonText}>Reset</Text>
         </TouchableOpacity>
       </View>
@@ -109,33 +112,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f9f9f9',
   },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#333',
   },
   timerDisplay: {
     fontSize: 48,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#E81B0E',
   },
   input: {
     width: '80%',
     borderWidth: 1,
-    borderColor: '#ccc',
     borderRadius: 10,
     padding: 15,
     marginBottom: 20,
     fontSize: 16,
-    backgroundColor: '#fff',
   },
   setTimeButton: {
     width: '80%',
-    backgroundColor: '#E81B0E',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -148,7 +145,6 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    backgroundColor: '#E81B0E',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -158,9 +154,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  disabledButton: {
-    backgroundColor: '#ccc',
   },
 });
 
