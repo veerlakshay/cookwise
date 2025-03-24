@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from './ThemeContext';
+import RecipeDetails from './Recipe';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -27,7 +28,7 @@ const HomeScreen = () => {
 
   const handleRecipeSelect = (recipeName) => {
     if (recipes[recipeName]) {
-      navigation.navigate('RecipeDetail', {
+      navigation.navigate('RecipeDetails', {
         selectedRecipe: { ...recipes[recipeName], name: recipeName },
       });
     } else {

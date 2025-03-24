@@ -7,16 +7,26 @@ import TimerPage from './components/Timerpage';
 import FavoritesPage from './components/FavoriteRecipes';
 import SettingsPage from './components/SettingsPage';
 import RecipesPage from './components/Recipe';
+import { createStackNavigator } from '@react-navigation/stack';
 import RecipeHistoryPage from './components/RecipeHistory';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons'; // Icons for tabs
+import RecipeDetails from './components/Recipe';
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 // Custom Tab Bar Icon Component
 const CustomTabBarIcon = ({ name, color }) => {
   return <Ionicons name={name} size={24} color={color} />;
 };
+
+const HomeStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="HomeMain" component={HomeScreen} />
+    <Stack.Screen name="RecipeDetails" component={RecipeDetails} />
+  </Stack.Navigator>
+);
 
 // App Navigator with Dark Mode
 const AppNavigator = () => {
@@ -28,7 +38,6 @@ const AppNavigator = () => {
         tabBarIcon: ({ color }) => {
           let iconName;
           if (route.name === 'Home') iconName = 'home';
-          else if (route.name === 'Recipes') iconName = 'fast-food';
           else if (route.name === 'Timer') iconName = 'timer';
           else if (route.name === 'Favorites') iconName = 'heart';
           else if (route.name === 'Recipe History') iconName = 'book';
@@ -43,8 +52,7 @@ const AppNavigator = () => {
         headerShown: false, // Hide top header
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Recipes" component={RecipesPage} />
+      <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Timer" component={TimerPage} />
       <Tab.Screen name="Favorites" component={FavoritesPage} />
       <Tab.Screen name="Recipe History" component={RecipeHistoryPage} />
@@ -56,11 +64,14 @@ const AppNavigator = () => {
 // Main App Component
 const App = () => {
   return (
-    <ThemeProvider>
+    <SafeAreaView style={styles.container}>
+      <ThemeProvider>
       <NavigationContainer>
         <AppNavigator />
       </NavigationContainer>
     </ThemeProvider>
+    </SafeAreaView>
+    
   );
 };
 
@@ -80,6 +91,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
   },
+  container:{
+    flex: 1
+  }
 });
 
 export default App;

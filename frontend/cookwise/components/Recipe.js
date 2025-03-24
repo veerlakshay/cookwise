@@ -22,43 +22,46 @@ const RecipeDetails = ({ route }) => {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={goBack} style={[styles.backButton, { backgroundColor: theme.primary }]}>
-          <Text style={styles.backButtonText}>Back</Text>
-        </TouchableOpacity>
-        <Text style={[styles.recipeTitle, { color: theme.primary }]}>{selectedRecipe.name}</Text>
-      </View>
-
-      <View style={styles.detailsContainer}>
-        <Text style={[styles.subHeading, { color: theme.text }]}>Ingredients:</Text>
-        <View style={styles.ingredientList}>
-          {selectedRecipe.ingredients.map((ingredient, index) => (
-            <Text key={index} style={[styles.ingredientText, { color: theme.text }]}>
-              {ingredient}
-            </Text>
-          ))}
-        </View>
-
-        <Text style={[styles.subHeading, { color: theme.text }]}>Steps:</Text>
-        <View style={styles.stepList}>
-          {selectedRecipe.steps.map((step, index) => (
-            <Text key={index} style={[styles.stepText, { color: theme.text }]}>
-              {`${index + 1}. ${step}`}
-            </Text>
-          ))}
-        </View>
-      </View>
-    </ScrollView>
+    <View style={styles.header}>
+         <TouchableOpacity
+           style={styles.backButton}
+           onPress={() => navigation.goBack()}
+         >
+           <Text style={styles.backButtonText}>←</Text>
+           </TouchableOpacity>
+           <Text style={styles.recipeName}>{selectedRecipe.name}</Text>
+           </View>
+       
+       <Text style={styles.subHeading}>Calories: {selectedRecipe.calories}</Text>
+       <Text style={styles.subHeading}>Steps:</Text>
+       {Object.keys(selectedRecipe.preparation)
+         .sort((a, b) => parseInt(a) - parseInt(b))
+         .map((stepNumber) => (
+           <Text key={stepNumber} style={styles.recipeText}>
+             {stepNumber}. {selectedRecipe.preparation[stepNumber]}
+           </Text>
+         ))}
+     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  recipeName: { fontSize: 24, fontWeight: 'bold', color: '#E81B0E' },
+  subHeading: { fontSize: 20, marginTop: 10, marginBottom: 5, color: '#333' },
+  recipeText: { fontSize: 16, color: '#555', marginBottom: 5 },
+  backButton: {
+    backgroundColor: '#E81B0E',
+    padding: 10,
+    width: 40,
+    borderRadius: 5,
+    marginBottom: 10,},
   container: {
     flex: 1,
     padding: 20,
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
   },
@@ -83,6 +86,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
+  backButtonText: { color: '#E81B0E', fontSize: 16 },
   ingredientList: {
     marginBottom: 20,
   },
