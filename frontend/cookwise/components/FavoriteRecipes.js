@@ -1,83 +1,148 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useTheme } from './ThemeContext'; // Import dark mode context
+import { getFavoriteRecipes, removeFromFavorites } from '../utils/favoriteStorage';
+import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
-const FavoriteRecipes = () => {
+const FavoriteRecipes = ({ route }) => {
   const { isDarkMode } = useTheme(); // Get dark mode state
   const [favorites, setFavorites] = useState([]); // List of favorite recipes
-  const [loading, setLoading] = useState(false); // Loading state for pagination
-  const [page, setPage] = useState(1); // Current page for pagination
+  const [loading, setLoading] = useState(true); // Loading state for initial load
+  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
+  const navigation = useNavigation();
 
-  // Mock data for favorite recipes 
-  const mockRecipes = [
-    { id: 1, name: 'Pasta Carbonara', description: 'Creamy pasta with bacon and eggs.' },
-    { id: 2, name: 'Chicken Tikka Masala', description: 'Spicy chicken curry with creamy tomato sauce.' },
-    { id: 3, name: 'Vegetable Stir Fry', description: 'Healthy stir-fried vegetables with soy sauce.' },
-    { id: 4, name: 'Beef Burger', description: 'Juicy beef patty with cheese and veggies.' },
-    { id: 5, name: 'Chocolate Cake', description: 'Rich and moist chocolate cake.' },
-  ];
-
-  // Simulate loading favorite recipes 
-  const loadFavorites = (pageNumber) => {
-    setLoading(true);
-    setTimeout(() => {
-      const newRecipes = mockRecipes.slice((pageNumber - 1) * 2, pageNumber * 2); // Load 2 recipes per page
-      setFavorites((prev) => [...prev, ...newRecipes]);
+  // Load favorite recipes from AsyncStorage
+  const loadFavorites = async () => {
+    try {
+      setLoading(true);
+      const favoriteRecipes = await getFavoriteRecipes();
+      // Filter out any invalid recipes (those without an id)
+      const validRecipes = favoriteRecipes.filter(recipe => recipe && recipe.id);
+      setFavorites(validRecipes);
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+      Alert.alert('Error', 'Failed to load favorite recipes');
+    } finally {
       setLoading(false);
-    }, 1000); // Simulate network delay
+    }
   };
 
   // Load initial favorites
   useEffect(() => {
-    loadFavorites(page);
+    loadFavorites();
   }, []);
 
-  // Load more recipes when reaching the end of the list
-  const handleLoadMore = () => {
-    if (!loading) {
-      setPage((prev) => prev + 1);
-      loadFavorites(page + 1);
+  // Refresh favorites when screen comes into focus or when refresh parameter is received
+  useFocusEffect(
+    React.useCallback(() => {
+      // Check if we need to refresh from navigation params
+      if (route.params?.refresh) {
+        loadFavorites();
+        // Clear the refresh parameter
+        route.params.refresh = false;
+      }
+    }, [route.params])
+  );
+
+  // Handle pull-to-refresh
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    await loadFavorites();
+    setRefreshing(false);
+  }, []);
+
+  // Remove recipe from favorites
+  const handleRemoveFavorite = async (id) => {
+    try {
+      if (!id) {
+        console.error('Cannot remove favorite: ID is undefined');
+        Alert.alert('Error', 'Cannot remove this recipe from favorites');
+        return;
+      }
+      
+      const success = await removeFromFavorites(id);
+      if (success) {
+        setFavorites(prevFavorites => prevFavorites.filter(recipe => recipe && recipe.id !== id));
+        Alert.alert('Success', 'Recipe removed from favorites');
+      } else {
+        Alert.alert('Error', 'Failed to remove recipe from favorites');
+      }
+    } catch (error) {
+      console.error('Error removing favorite:', error);
+      Alert.alert('Error', 'An unexpected error occurred');
     }
   };
 
-  // Remove recipe from favorites
-  const handleRemoveFavorite = (id) => {
-    setFavorites((prevFavorites) => prevFavorites.filter(recipe => recipe.id !== id));
+  // Navigate to recipe details
+  const handleViewRecipe = (recipe) => {
+    if (!recipe) {
+      console.error('Cannot view recipe: Recipe is undefined');
+      Alert.alert('Error', 'Cannot view this recipe');
+      return;
+    }
+    
+    navigation.navigate('RecipeDetails', {
+      selectedRecipe: recipe,
+      fromFavorites: true
+    });
   };
 
   // Render each recipe item
-  const renderRecipeItem = ({ item }) => (
-    <View style={[styles.recipeItem, isDarkMode && styles.darkRecipeItem]}>
-      <Text style={[styles.recipeName, isDarkMode && styles.darkRecipeName]}>{item.name}</Text>
-      <Text style={[styles.recipeDescription, isDarkMode && styles.darkRecipeDescription]}>{item.description}</Text>
-      <TouchableOpacity style={[styles.favoriteButton, isDarkMode && styles.darkFavoriteButton]} onPress={() => handleRemoveFavorite(item.id)}>
-        <Text style={[styles.favoriteButtonText, isDarkMode && styles.darkFavoriteButtonText]}>Remove from Favorites</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  // Render footer for loading indicator
-  const renderFooter = () => {
-    if (!loading) return null;
+  const renderRecipeItem = ({ item }) => {
+    if (!item) {
+      return null; // Skip rendering if item is undefined
+    }
+    
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="small" color="#E81B0E" />
+      <View style={[styles.recipeItem, isDarkMode && styles.darkRecipeItem]}>
+        <TouchableOpacity onPress={() => handleViewRecipe(item)}>
+          <Text style={[styles.recipeName, isDarkMode && styles.darkRecipeName]}>{item.name || 'Unnamed Recipe'}</Text>
+          <Text style={[styles.recipeDescription, isDarkMode && styles.darkRecipeDescription]}>{item.description || 'No description available'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.favoriteButton, isDarkMode && styles.darkFavoriteButton]} 
+          onPress={() => handleRemoveFavorite(item.id)}
+        >
+          <Text style={[styles.favoriteButtonText, isDarkMode && styles.darkFavoriteButtonText]}>Remove from Favorites</Text>
+        </TouchableOpacity>
       </View>
     );
   };
 
+  // Render empty state when no favorites
+  const renderEmptyComponent = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={[styles.emptyText, isDarkMode && styles.darkEmptyText]}>
+        You don't have any favorite recipes yet.
+      </Text>
+    </View>
+  );
+
   return (
     <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       <Text style={[styles.heading, isDarkMode && styles.darkHeading]}>Favorite Recipes</Text>
-      <FlatList
-        data={favorites}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderRecipeItem}
-        onEndReached={handleLoadMore} // Triggered when reaching the end of the list
-        onEndReachedThreshold={0.5} // Load more when 50% of the list is scrolled
-        ListFooterComponent={renderFooter} // Show loading indicator at the bottom
-        contentContainerStyle={styles.listContent}
-      />
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#E81B0E" />
+        </View>
+      ) : (
+        <FlatList
+          data={favorites}
+          keyExtractor={(item) => (item && item.id ? item.id.toString() : Math.random().toString())}
+          renderItem={renderRecipeItem}
+          ListEmptyComponent={renderEmptyComponent}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['#E81B0E']}
+              tintColor={isDarkMode ? '#FF6B6B' : '#E81B0E'}
+            />
+          }
+        />
+      )}
     </View>
   );
 };
@@ -154,8 +219,23 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   loadingContainer: {
-    padding: 10,
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+  },
+  darkEmptyText: {
+    color: '#ccc',
   },
 });
 

@@ -26,10 +26,17 @@ const HomeScreen = () => {
     setIngredientsList(updatedList);
   };
 
-  const handleRecipeSelect = (recipeName) => {
+  const handleRecipeSelect = (recipeName, fromFavorites = false) => {
     if (recipes[recipeName]) {
+      // Ensure the recipe has an ID
+      const recipe = { ...recipes[recipeName], name: recipeName };
+      if (!recipe.id) {
+        recipe.id = Math.floor(Math.random() * 1000000);
+      }
+      
       navigation.navigate('RecipeDetails', {
-        selectedRecipe: { ...recipes[recipeName], name: recipeName },
+        selectedRecipe: recipe,
+        fromFavorites: fromFavorites
       });
     } else {
       Alert.alert('Error', 'Recipe not found');
@@ -75,7 +82,16 @@ const HomeScreen = () => {
         Alert.alert('No recipes found', 'Try different ingredients.');
         setRecipes(null);
       } else {
-        setRecipes(result.recipes);
+        // Ensure all recipes have IDs
+        const recipesWithIds = {};
+        Object.keys(result.recipes).forEach((recipeName, index) => {
+          const recipe = result.recipes[recipeName];
+          recipesWithIds[recipeName] = {
+            ...recipe,
+            id: recipe.id || index + 1 // Use existing ID or generate a new one
+          };
+        });
+        setRecipes(recipesWithIds);
       }
     } catch (error) {
       console.error('Error calling API:', error);
