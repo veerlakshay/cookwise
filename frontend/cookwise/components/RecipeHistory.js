@@ -18,6 +18,9 @@ const RecipeHistory = ({ navigation }) => {
         } else {
           setHistory([]);
         }
+        if (history.length > 20) {
+          history = history.slice(0, 20);
+        }
       };
 
       fetchHistory();
