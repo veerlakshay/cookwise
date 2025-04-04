@@ -28,6 +28,13 @@ const HomeStack = () => (
   </Stack.Navigator>
 );
 
+const HistoryStack = () => (
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Screen name="RecipeHistory" component={RecipeHistoryPage} />
+    <Stack.Screen name="RecipeDetails" component={RecipeDetails} />
+  </Stack.Navigator>
+);
+
 // App Navigator with Dark Mode
 const AppNavigator = () => {
   const { theme } = useTheme(); // Use theme from custom ThemeContext
@@ -55,7 +62,7 @@ const AppNavigator = () => {
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Timer" component={TimerPage} />
       <Tab.Screen name="Favorites" component={FavoritesPage} />
-      <Tab.Screen name="Recipe History" component={RecipeHistoryPage} />
+      <Tab.Screen name="Recipe History" component={HistoryStack} />
       <Tab.Screen name="Settings" component={SettingsPage} />
     </Tab.Navigator>
   );

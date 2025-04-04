@@ -2,20 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from './ThemeContext';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const RecipeHistory = ({ navigation }) => {
   const [history, setHistory] = useState([]);
   const { theme } = useTheme();
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      const storedHistory = await AsyncStorage.getItem('recipeHistory');
-      if (storedHistory) {
-        setHistory(JSON.parse(storedHistory));
-      }
-    };
-    fetchHistory();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchHistory = async () => {
+        const storedHistory = await AsyncStorage.getItem('recipeHistory');
+        if (storedHistory) {
+          setHistory(JSON.parse(storedHistory));
+        } else {
+          setHistory([]);
+        }
+      };
+
+      fetchHistory();
+    }, [])
+  );
+
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
@@ -26,7 +34,7 @@ const RecipeHistory = ({ navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity 
             style={[styles.item, { backgroundColor: theme.card }]} 
-            onPress={() => navigation.navigate('RecipeDetail', { recipe: item })}
+            onPress={() => navigation.navigate('RecipeDetails', { selectedRecipe: item })}
           >
             <Text style={[styles.recipeText, { color: theme.text }]}>
               {item.name}

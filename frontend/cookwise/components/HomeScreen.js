@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, Activity
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from './ThemeContext';
 import RecipeDetails from './Recipe';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -21,6 +22,22 @@ const HomeScreen = () => {
     }
   };
 
+  const saveHistory = async (recipe) => {
+    try {
+      const storedHistory = await AsyncStorage.getItem('recipeHistory');
+      let history = storedHistory ? JSON.parse(storedHistory) : [];
+  
+      history = history.filter(item => item.name !== recipe.name);
+  
+      // Add the newest recipe at the top
+      history.unshift(recipe);
+  
+      await AsyncStorage.setItem('recipeHistory', JSON.stringify(history));
+    } catch (error) {
+      console.error('Error saving to history:', error);
+    }
+  };
+
   const removeIngredient = (index) => {
     const updatedList = ingredientsList.filter((_, idx) => idx !== index);
     setIngredientsList(updatedList);
@@ -28,11 +45,13 @@ const HomeScreen = () => {
 
   const handleRecipeSelect = (recipeName, fromFavorites = false) => {
     if (recipes[recipeName]) {
-      // Ensure the recipe has an ID
       const recipe = { ...recipes[recipeName], name: recipeName };
       if (!recipe.id) {
         recipe.id = Math.floor(Math.random() * 1000000);
       }
+
+      saveHistory(recipe);
+
       
       navigation.navigate('RecipeDetails', {
         selectedRecipe: recipe,
