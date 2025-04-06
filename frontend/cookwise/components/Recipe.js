@@ -80,31 +80,37 @@ const RecipeDetails = ({ route }) => {
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-         <TouchableOpacity
-           style={styles.backButton}
-           onPress={() => navigation.goBack()}
-         >
-           <Text style={styles.backButtonText}>←</Text>
-         </TouchableOpacity>
-         <Text style={styles.recipeName}>{selectedRecipe.name}</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={26} color={theme.primary} />
+        </TouchableOpacity>
+        <Text style={[styles.recipeName, { color: theme.primary }]}>{selectedRecipe.name}</Text>
+        <View style={{ width: 26 }} /> {/* placeholder to balance arrow icon spacing */}
       </View>
-       
-      <Text style={styles.subHeading}>Calories: {selectedRecipe.calories}</Text>
-      <Text style={styles.subHeading}>Steps:</Text>
-      {Object.keys(selectedRecipe.preparation)
-        .sort((a, b) => parseInt(a) - parseInt(b))
-        .map((stepNumber) => (
-          <Text key={stepNumber} style={styles.recipeText}>
-            {stepNumber}. {selectedRecipe.preparation[stepNumber]}
-          </Text>
-        ))}
-      
+
+      <View style={styles.section}>
+        <Text style={[styles.label, { color: theme.text }]}>Calories</Text>
+        <Text style={[styles.value, { color: theme.text }]}>{selectedRecipe.calories}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.label, { color: theme.text }]}>Steps</Text>
+        {Object.keys(selectedRecipe.preparation)
+          .sort((a, b) => parseInt(a) - parseInt(b))
+          .map((stepNumber) => (
+            <View key={stepNumber} style={[styles.stepCard, { backgroundColor: theme.card }]}>
+              <Text style={[styles.stepText, { color: theme.text }]}>
+                {stepNumber}. {selectedRecipe.preparation[stepNumber]}
+              </Text>
+            </View>
+          ))}
+      </View>
+
       <View style={styles.favoriteContainer}>
-        <TouchableOpacity onPress={toggleFavorite} style={styles.favoriteButton}>
+        <TouchableOpacity onPress={toggleFavorite} style={[styles.favoriteButton, { backgroundColor: theme.primary }]}>
           <Ionicons 
             name={isFavorite ? "heart" : "heart-outline"} 
             size={24} 
-            color={isFavorite ? "#E81B0E" : "#fff"} 
+            color="#fff" 
           />
           <Text style={styles.favoriteText}>
             {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
@@ -116,85 +122,72 @@ const RecipeDetails = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  recipeName: { fontSize: 24, fontWeight: 'bold', color: '#E81B0E' },
-  subHeading: { fontSize: 20, marginTop: 10, marginBottom: 5, color: '#333' },
-  recipeText: { fontSize: 16, color: '#555', marginBottom: 5 },
-  backButton: {
-    backgroundColor: '#E81B0E',
-    padding: 10,
-    width: 40,
-    borderRadius: 5,
-    marginBottom: 10,},
   container: {
     flex: 1,
     padding: 20,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 25,
+  },
+  recipeName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  section: {
     marginBottom: 20,
   },
-  backButton: {
-    padding: 10,
-    borderRadius: 5,
+  label: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 8,
   },
-  backButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  recipeTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginLeft: 20,
-  },
-  detailsContainer: {
-    marginTop: 20,
-  },
-  subHeading: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  backButtonText: { color: '#E81B0E', fontSize: 16 },
-  ingredientList: {
-    marginBottom: 20,
-  },
-  ingredientText: {
+  value: {
     fontSize: 18,
-    marginBottom: 5,
   },
-  stepList: {
-    marginBottom: 20,
+  stepCard: {
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
   },
   stepText: {
-    fontSize: 18,
-    marginBottom: 5,
-  },
-  errorText: {
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    lineHeight: 22,
   },
   favoriteContainer: {
-    marginTop: 30,
-    marginBottom: 30,
     alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 50,
   },
   favoriteButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#E81B0E',
-    padding: 15,
-    borderRadius: 10,
-    width: '80%',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    width: '90%',
   },
   favoriteText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,
+  },
+  errorText: {
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

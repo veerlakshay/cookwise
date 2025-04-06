@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from './ThemeContext';
 import RecipeDetails from './Recipe';
@@ -120,155 +120,150 @@ const HomeScreen = () => {
     }
   };
 
-  return (
-    <View style={[styles.container, { backgroundColor: theme.background }]}>
+return (
+    <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.heading, { color: theme.primary }]}>CookWise</Text>
 
-      <View style={[styles.inputContainer, { backgroundColor: theme.card }]}>
+      <View style={[styles.card, { backgroundColor: theme.card }]}>
         <TextInput
-          style={[styles.input, { backgroundColor: theme.card, color: theme.text }]}
+          style={[styles.input, { backgroundColor: theme.input, color: theme.text }]}
           placeholder="e.g., eggs, milk"
           placeholderTextColor={theme.placeholder}
           value={ingredient}
           onChangeText={setIngredient}
         />
-        <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={addIngredient}>
-          <Text style={styles.buttonText}>Add Ingredient</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={callApi} style={[styles.button, { backgroundColor: theme.primary }]}>
-          <Text style={styles.buttonText}>Search</Text>
-        </TouchableOpacity>
-
         <TextInput
-          style={[styles.input, { backgroundColor: theme.card, color: theme.text }]}
+          style={[styles.input, { backgroundColor: theme.input, color: theme.text }]}
           placeholder="Number of portions (e.g., 2)"
           placeholderTextColor={theme.placeholder}
           keyboardType="numeric"
           value={portion}
           onChangeText={setPortion}
         />
+
+        <View style={styles.buttonRow}>
+          <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={addIngredient}>
+            <Text style={styles.buttonText}>Add Ingredient</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={callApi}>
+            <Text style={styles.buttonText}>Search</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {ingredientsList.length > 0 && (
-        <View style={styles.ingredientsContainer}>
-          <Text style={[styles.subHeading, { color: theme.text }]}>Ingredients:</Text>
-          <FlatList
-            data={ingredientsList}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item, index }) => (
-              <View style={styles.listItemContainer}>
-                <Text style={[styles.listItem, { color: theme.text }]}>
-                  {index + 1}. {item}
-                </Text>
-                <TouchableOpacity
-                  style={[styles.removeButton, { backgroundColor: theme.primary }]}
-                  onPress={() => removeIngredient(index)}
-                >
-                  <Text style={styles.buttonText}>Remove</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          />
+        <View style={[styles.card, { backgroundColor: theme.card }]}>
+          <Text style={[styles.subHeading, { color: theme.primary }]}>Ingredients:</Text>
+          {ingredientsList.map((item, index) => (
+            <View key={index} style={styles.listItemContainer}>
+              <Text style={[styles.listItem, { color: theme.text }]}>{index + 1}. {item}</Text>
+              <TouchableOpacity
+                style={[styles.removeButton, { backgroundColor: theme.primary }]}
+                onPress={() => removeIngredient(index)}
+              >
+                <Text style={styles.buttonText}>Remove</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
         </View>
       )}
 
       {loading ? (
         <ActivityIndicator size="large" color={theme.primary} style={{ marginTop: 20 }} />
       ) : recipes ? (
-        <View style={styles.recipeContainer}>
-          <FlatList
-            data={Object.keys(recipes)}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={[styles.recipeChoice, { backgroundColor: theme.card }]}
-                onPress={() => handleRecipeSelect(item)}
-              >
-                <Text style={[styles.recipeChoiceText, { color: theme.text }]}>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
+        <View style={[styles.card, { backgroundColor: theme.card }]}>
+          <Text style={[styles.subHeading, { color: theme.primary }]}>Recipes:</Text>
+          {Object.keys(recipes).map((recipeName) => (
+            <TouchableOpacity
+              key={recipeName}
+              style={[styles.recipeChoice, { backgroundColor: theme.input }]}
+              onPress={() => handleRecipeSelect(recipeName)}
+            >
+              <Text style={[styles.recipeChoiceText, { color: theme.text }]}>{recipeName}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
       ) : (
         <Text style={[styles.noRecipeText, { color: theme.text }]}>No recipe found. Try searching!</Text>
       )}
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    paddingBottom: 80,
+    paddingBottom: 40,
   },
   heading: {
-    fontSize: 35,
+    fontSize: 36,
     textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 20,
     fontFamily: 'cursive',
-    paddingBottom: 20,
   },
-  inputContainer: {
-    padding: 10,
-    borderRadius: 10,
-    borderColor: '#ddd',
-    borderWidth: 1,
+  card: {
+    padding: 15,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
     marginBottom: 20,
   },
   input: {
     borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
     padding: 10,
-    marginVertical: 10,
-    borderRadius: 5,
-    height: 40,
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
+    flex: 1,
+    marginHorizontal: 5,
     paddingVertical: 10,
-    borderRadius: 5,
+    borderRadius: 10,
     alignItems: 'center',
-    margin: 5,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
-  },
-  ingredientsContainer: {
-    marginTop: 10,
-  },
-  recipeContainer: {
-    marginTop: 20,
-  },
-  recipeChoice: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  recipeChoiceText: {
-    fontSize: 18,
+    fontWeight: 'bold',
   },
   subHeading: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  listItem: {
-    fontSize: 18,
-    marginBottom: 5,
+    marginBottom: 10,
   },
   listItemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
+  },
+  listItem: {
+    fontSize: 16,
   },
   removeButton: {
-    padding: 5,
-    borderRadius: 5,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+  },
+  recipeChoice: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  recipeChoiceText: {
+    fontSize: 18,
   },
   noRecipeText: {
     textAlign: 'center',
+    fontSize: 16,
     marginTop: 20,
   },
 });
