@@ -101,7 +101,7 @@ const HomeScreen = () => {
         Alert.alert('No recipes found', 'Try different ingredients.');
         setRecipes(null);
       } else {
-        // Ensure all recipes have IDs
+        // Ensure all recipes have IDs 
         const recipesWithIds = {};
         Object.keys(result.recipes).forEach((recipeName, index) => {
           const recipe = result.recipes[recipeName];
