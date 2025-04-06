@@ -82,9 +82,13 @@ const FavoriteRecipes = ({ route }) => {
       return;
     }
     
-    navigation.navigate('RecipeDetails', {
-      selectedRecipe: recipe,
-      fromFavorites: true
+    // Navigate to the RecipeDetails screen in the Home stack
+    navigation.navigate('Home', {
+      screen: 'RecipeDetails',
+      params: {
+        selectedRecipe: recipe,
+        fromFavorites: true
+      }
     });
   };
 
