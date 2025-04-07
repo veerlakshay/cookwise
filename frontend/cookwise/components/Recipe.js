@@ -11,7 +11,6 @@ const RecipeDetails = ({ route }) => {
   const { theme } = useTheme();
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Check if recipe is in favorites when component mounts
   useEffect(() => {
     const checkFavoriteStatus = async () => {
       if (selectedRecipe && selectedRecipe.id) {
@@ -22,7 +21,7 @@ const RecipeDetails = ({ route }) => {
         setIsFavorite(false);
       }
     };
-    
+
     checkFavoriteStatus();
   }, [selectedRecipe]);
 
@@ -45,9 +44,8 @@ const RecipeDetails = ({ route }) => {
         Alert.alert('Error', 'Cannot add this recipe to favorites');
         return;
       }
-      
+
       if (isFavorite) {
-        // Remove from favorites
         const success = await removeFromFavorites(selectedRecipe.id);
         if (success) {
           setIsFavorite(false);
@@ -56,15 +54,12 @@ const RecipeDetails = ({ route }) => {
           Alert.alert('Error', 'Failed to remove recipe from favorites');
         }
       } else {
-        // Add to favorites
         const success = await addToFavorites(selectedRecipe);
         if (success) {
           setIsFavorite(true);
           Alert.alert('Success', 'Recipe added to favorites');
-          
-          // If we're on the Favorites screen, refresh the list
+
           if (route.params?.fromFavorites) {
-            // Navigate back to Favorites screen with refresh parameter
             navigation.navigate('Favorites', { refresh: true });
           }
         } else {
@@ -77,44 +72,85 @@ const RecipeDetails = ({ route }) => {
     }
   };
 
+  const renderStepContent = (content) => {
+    if (typeof content === 'string') {
+      return <Text>{content}</Text>;
+    } else if (typeof content === 'object') {
+      return (
+        <>
+          {Object.entries(content).map(([key, value]) => (
+            <Text key={key}>
+              {key}: {typeof value === 'string' ? value : JSON.stringify(value)}{'\n'}
+            </Text>
+          ))}
+        </>
+      );
+    }
+    return <Text>{String(content)}</Text>;
+  };
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={goBack}>
           <Ionicons name="arrow-back" size={26} color={theme.primary} />
         </TouchableOpacity>
-        <Text style={[styles.recipeName, { color: theme.primary }]}>{selectedRecipe.name}</Text>
-        <View style={{ width: 26 }} /> {/* placeholder to balance arrow icon spacing */}
+        <Text style={[styles.recipeName, { color: theme.primary }]}>
+          {selectedRecipe?.name || 'Recipe'}
+        </Text>
+        <View style={{ width: 26 }} />
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.label, { color: theme.text }]}>Calories</Text>
-        <Text style={[styles.value, { color: theme.text }]}>{selectedRecipe.calories}</Text>
+        <Text style={[styles.value, { color: theme.text }]}>
+          {selectedRecipe?.calories || 'N/A'}
+        </Text>
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.label, { color: theme.text }]}>Steps</Text>
-        {Object.keys(selectedRecipe.preparation)
-          .sort((a, b) => parseInt(a) - parseInt(b))
-          .map((stepNumber) => (
-            <View key={stepNumber} style={[styles.stepCard, { backgroundColor: theme.card }]}>
+        {selectedRecipe?.preparation && (
+          typeof selectedRecipe.preparation === 'object' ? (
+            Object.keys(selectedRecipe.preparation)
+              .sort((a, b) => parseInt(a) - parseInt(b))
+              .map((stepNumber) => {
+                const stepContent = selectedRecipe.preparation[stepNumber];
+                return (
+                  <View key={stepNumber} style={[styles.stepCard, { backgroundColor: theme.card }]}>
+                    <Text style={[styles.stepText, { color: theme.text }]}>
+                      {stepNumber}. {renderStepContent(stepContent)}
+                    </Text>
+                  </View>
+                );
+              })
+          ) : (
+            <View style={[styles.stepCard, { backgroundColor: theme.card }]}>
               <Text style={[styles.stepText, { color: theme.text }]}>
-                {stepNumber}. {selectedRecipe.preparation[stepNumber]}
+                {typeof selectedRecipe.preparation === 'string'
+                  ? selectedRecipe.preparation
+                  : JSON.stringify(selectedRecipe.preparation)}
               </Text>
             </View>
-          ))}
+          )
+        )}
       </View>
 
       <View style={styles.favoriteContainer}>
-        <TouchableOpacity onPress={toggleFavorite} style={[styles.favoriteButton, { backgroundColor: theme.primary }]}>
-          <Ionicons 
-            name={isFavorite ? "heart" : "heart-outline"} 
-            size={24} 
-            color="#fff" 
-          />
-          <Text style={styles.favoriteText}>
-            {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-          </Text>
+        <TouchableOpacity 
+          onPress={toggleFavorite} 
+          style={[styles.favoriteButton, { backgroundColor: theme.primary }]}
+        >
+          <View style={styles.favoriteButtonContent}>
+            <Ionicons
+              name={isFavorite ? "heart" : "heart-outline"}
+              size={24}
+              color="#fff"
+            />
+            <Text style={styles.favoriteText}>
+              {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+            </Text>
+          </View>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -170,13 +206,15 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   favoriteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 12,
     width: '90%',
+  },
+  favoriteButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   favoriteText: {
     color: '#fff',

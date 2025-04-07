@@ -26,12 +26,12 @@ const HomeScreen = () => {
     try {
       const storedHistory = await AsyncStorage.getItem('recipeHistory');
       let history = storedHistory ? JSON.parse(storedHistory) : [];
-  
+
       history = history.filter(item => item.name !== recipe.name);
-  
+
       // Add the newest recipe at the top
       history.unshift(recipe);
-  
+
       await AsyncStorage.setItem('recipeHistory', JSON.stringify(history));
     } catch (error) {
       console.error('Error saving to history:', error);
@@ -52,7 +52,6 @@ const HomeScreen = () => {
 
       saveHistory(recipe);
 
-      
       navigation.navigate('RecipeDetails', {
         selectedRecipe: recipe,
         fromFavorites: fromFavorites
@@ -120,7 +119,7 @@ const HomeScreen = () => {
     }
   };
 
-return (
+  return (
     <ScrollView contentContainerStyle={[styles.container, { backgroundColor: theme.background }]}>
       <Text style={[styles.heading, { color: theme.primary }]}>CookWise</Text>
 
@@ -142,10 +141,30 @@ return (
         />
 
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={addIngredient}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              {
+                backgroundColor: theme.primary,
+                opacity: loading ? 0.5 : 1
+              }
+            ]}
+            onPress={addIngredient}
+            disabled={loading}
+          >
             <Text style={styles.buttonText}>Add Ingredient</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.button, { backgroundColor: theme.primary }]} onPress={callApi}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              {
+                backgroundColor: theme.primary,
+                opacity: loading ? 0.5 : 1
+              }
+            ]}
+            onPress={callApi}
+            disabled={loading}
+          >
             <Text style={styles.buttonText}>Search</Text>
           </TouchableOpacity>
         </View>
@@ -160,6 +179,7 @@ return (
               <TouchableOpacity
                 style={[styles.removeButton, { backgroundColor: theme.primary }]}
                 onPress={() => removeIngredient(index)}
+                disabled={loading}
               >
                 <Text style={styles.buttonText}>Remove</Text>
               </TouchableOpacity>
